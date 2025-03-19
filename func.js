@@ -21,11 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const userMessage = userInput.value.trim();
         if (!userMessage) return;
 
-        // Добавляем сообщение от пользователя с префиксом "Вы:"
+        //чтоб в сообщениях выводилось обращение в сообщении
         addMessageToHistory('user', `Вы: ${userMessage}`);
         userInput.value = '';
 
-        // Отображаем сообщение, что ИИ ищет ответ
+        //Ожидание ответа от ии (чтобы понимать что он что-то ищет)
         const thinkingMessage = document.createElement('div');
         thinkingMessage.classList.add('message', 'assistant');
         thinkingMessage.innerHTML = '<strong>ИИ ищет ответ для вас...</strong>';
@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     model: 'gemma:2b',
                     messages: [
                         {
+                            //настройка ии по моей теме
                             role: 'system',
                             content: 'Вы — высококвалифицированный эксперт в области истории оружия, специализирующийся на анализе эволюции различных типов оружия и их влиянии на культуру, общество и военные конфликты.' +
                             'Ответы должны быть точными, логичными, структурированными и изложенными на русском языке, с четким объяснением всех терминов.' +
@@ -58,9 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             if (data.message && data.message.content) {
-                // Удаляем сообщение "ИИ ищет ответ"
                 thinkingMessage.remove();
-                // Добавляем ответ ИИ с префиксом "ИИ:"
                 addMessageToHistory('assistant', `ИИ: ${formatResponse(data.message.content)}`);
             }
         } catch (error) {
@@ -71,10 +70,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function formatResponse(text) {
-        // Убираем лишние пробелы по краям
+        //убираем лишние пробелы по краям
         text = text.trim();
     
-        // Заменяем английские термины на русский
+        //так некоторые слова при тесте часто были с ошибками, сделал их изменение
         text = text.replace(/firearms/g, 'огнестрельное оружие')
                    .replace(/weaponists/g, 'оружейники')
                    .replace(/history/g, 'история')
@@ -88,27 +87,26 @@ document.addEventListener('DOMContentLoaded', () => {
                    .replace(/grenades/g, 'гранаты')
                    .replace(/hand-made/g, 'самодельное');
     
-        // Разделяем текст на абзацы, если встречается двойной перенос строки
+        //разделение текст на абзацы
         text = text.replace(/\n\n+/g, '</p><p>');
-    
-        // Форматируем списки: заменяем пункты на теги <li> и заключаем в <ul>
+        //форматирование текста: замена пункты на теги <li> и заключаем в <ul>
         text = text.replace(/\n-\s+/g, '<li>').replace(/\n/g, '</li>');
     
-        // Окружим список тегами <ul>
+        //Окружим список тегами <ul>
         if (text.includes('<li>')) {
             text = `<ul>${text}</ul>`;
         }
     
-        // Форматируем жирный текст, окружая его тегами <strong>
+        //формтирование жирный текст, окружая его тегами <strong>
         text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // жирный текст
     
-        // Форматируем курсивный текст, окружая его тегами <em>
+        //форматирование курсивный текст, окружая его тегами <em>
         text = text.replace(/\*(.*?)\*/g, '<em>$1</em>'); // курсивный текст
     
-        // Добавляем правильные запятые и точки для читаемости
+        //правильные запятые и точки для читаемости
         text = text.replace(/(\w)(\s+)/g, '$1, '); // Добавляем запятую после каждого слова
     
-        // Возвращаем отформатированный текст с абзацами
+        //ритерн отформатированный текст с абзацами
         return `<p>${text}</p>`;
     }
     
@@ -121,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messageText.innerHTML = message;
         messageElement.appendChild(messageText);
 
-        // Для сообщений от ИИ добавляем кнопку сохранения, только если это не временное сообщение
+        //от ии кнопка сохранить ответ
         if (role === 'assistant' && !message.includes("ИИ ищет ответ для вас...")) {
             const saveButton = document.createElement('button');
             saveButton.textContent = 'Сохранить ответ';
@@ -137,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function saveAnswer(message) {
-        // Извлекаем текст без HTML тегов
+        //извлечение текст без HTML тегов
         const textToCopy = message.replace(/(<([^>]+)>)/gi, "");
         navigator.clipboard.writeText(textToCopy)
             .then(() => {

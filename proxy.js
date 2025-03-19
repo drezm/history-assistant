@@ -11,7 +11,7 @@ app.use(
         changeOrigin: true,
         pathRewrite: { '^/ollama': '' },
         onProxyRes: (proxyRes) => {
-            // Добавляем заголовки CORS
+            //cors
             proxyRes.headers['Access-Control-Allow-Origin'] = '*';
             proxyRes.headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS';
             proxyRes.headers['Access-Control-Allow-Headers'] = 'Content-Type';
